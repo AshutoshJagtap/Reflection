@@ -1,24 +1,30 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
-
 namespace ReflectionDemo
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Type t = Type.GetType("ReflectionDemo.Customer");
+            //If you want use reflection on other project Assembly.
+            //you must need to add reference of this Assembly in current project
+            Assembly assembly = Assembly.LoadFrom("BusinessLayer.dll");
+            Type type= assembly.GetTypes().Where(x=>x.Name== "Customer").FirstOrDefault();
 
-            Console.WriteLine("Name : ");
-            Console.WriteLine($"Fullname = {t.FullName}");
-            Console.WriteLine($"Name = {t.Name}");
-            Console.WriteLine($"Namespace = {t.Namespace}");
+            //If you want use reflection on current executing Assembly.
+            //Type type =Type.GetType("ReflectionDemo.Customer");
+
+            Console.WriteLine("Assembly Information : ");
+            Console.WriteLine($"Fullname = {type.FullName}");
+            Console.WriteLine($"Name = {type.Name}");
+            Console.WriteLine($"Namespace = {type.Namespace}");
             Console.WriteLine();
             Console.WriteLine("------------------------------------------------");
 
             Console.WriteLine("Property Information");
             Console.WriteLine();
-            PropertyInfo[] properties = t.GetProperties();
+            PropertyInfo[] properties = type.GetProperties();
 
             foreach (PropertyInfo property in properties)
             {
@@ -26,11 +32,10 @@ namespace ReflectionDemo
             }
             Console.WriteLine();
             Console.WriteLine("------------------------------------------------");
-            Console.WriteLine();
-
 
             Console.WriteLine("Constructor Information");
-            ConstructorInfo[] constructors = t.GetConstructors();
+            Console.WriteLine();
+            ConstructorInfo[] constructors = type.GetConstructors();
 
             foreach (ConstructorInfo constructor in constructors)
             {
@@ -49,7 +54,7 @@ namespace ReflectionDemo
 
             Console.WriteLine("Method Information");
             Console.WriteLine();
-            MethodInfo[] methods = t.GetMethods();
+            MethodInfo[] methods = type.GetMethods();
 
             foreach (MethodInfo method in methods)
             {
@@ -69,78 +74,36 @@ namespace ReflectionDemo
 
             Console.WriteLine("Nested Type Information");
             Console.WriteLine();
-            Type[] nestedTypes = t.GetNestedTypes();
+            Type[] nestedTypes = type.GetNestedTypes();
 
-            foreach (Type type in nestedTypes)
+            foreach (Type nestedType in nestedTypes)
             {
-                Console.WriteLine(type.BaseType.Name + " " + type.Name);
+                Console.WriteLine(nestedType.BaseType.Name + " " + nestedType.Name);
                 Console.WriteLine();
             }
             Console.WriteLine("------------------------------------------------");
 
             Console.WriteLine("Interfaces Information");
             Console.WriteLine();
-            Type[] interfaces = t.GetInterfaces();
+            Type[] interfaces = type.GetInterfaces();
 
-            foreach (Type type in interfaces)
+            foreach (Type Interface in interfaces)
             {
-                Console.WriteLine(type.FullName);
+                Console.WriteLine(Interface.FullName);
                 Console.WriteLine();
             }
             Console.WriteLine("------------------------------------------------");
 
-            Console.WriteLine("Calling  Methods");
+            Console.WriteLine("Calling  Constructor and Methods");
             Console.WriteLine();
 
-            Type t2 = Type.GetType("ReflectionDemo.Customer");
-            object objCustomer = Activator.CreateInstance(t2, 10, "ReflectionDemo");
-            MethodInfo methodInfo = t2.GetMethod("Display");
+            object objCustomer = Activator.CreateInstance(type, 10, "ReflectionDemo");
+            MethodInfo methodInfo = type.GetMethod("Display");
             object[] mParam = new object[1];
             mParam[0] = "This is a Reflection Demo !";
             methodInfo.Invoke(objCustomer, mParam);
 
             Console.ReadLine();
         }
-    }
-
-    public class Customer : ICustomer
-    {
-        public MyClass d { get; set; }
-        public MyInterface i { get; set; }
-        public delegate void mydelegate(string data);
-
-        public int id { get; set; }
-        public string name { get; set; }
-
-        public Customer()
-        {
-            Console.WriteLine("This is Default Constructor");
-        }
-
-        public Customer(int id, string name)
-        {
-            Console.WriteLine("This is Paramiterise Constructor");
-            this.id = id;
-            this.name = name;
-        }
-
-        public void Display(string data)
-        {
-            Console.WriteLine($"Id = {id} Name = {name}");
-            Console.WriteLine(data);
-        }
-    }
-    public class MyClass
-    {
-    }
-
-    public interface MyInterface
-    {
-
-    }
-
-    public interface ICustomer
-    {
-
     }
 }
