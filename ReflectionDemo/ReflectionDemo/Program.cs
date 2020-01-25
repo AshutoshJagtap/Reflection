@@ -9,6 +9,9 @@ namespace ReflectionDemo
         {
             //If you want use reflection on other project Assembly.
             //you must need to add reference of this Assembly in current project
+            //or if you don't want to add reference then need to provide full path of Assembly
+            //e.g Assembly.LoadFrom("../../../BusinessLayer/bin/Debug/BusinessLayer.dll")
+
             Assembly assembly = Assembly.LoadFrom("BusinessLayer.dll");
             Type type= assembly.GetTypes().Where(x=>x.Name== "Customer").FirstOrDefault();
 
